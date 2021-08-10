@@ -3,11 +3,9 @@
 #' This function handles a "default" call of edgeR to perform differential gene
 #' expression testing on a count matrix file. The experiment must be a
 #' one-factor design (this function isn't set up to handle multi-factor problems
-#' yet), but can have any number of levels in that design, as long as they are
-#' compared to a single reference group. Note that edgeR itself can handle much
-#' more complex designs through limma, but having the ability to catch that
-#' complexity in this function call is not so straightforward, and so very
-#' complex experiments should probably be run more manually than this.
+#' yet), but can have any number of levels in that design. You can either
+#' specify one reference group to compare all others against, or manually input
+#' all comparisons you want it to do. See examples for details.
 #'
 #'
 #' @param HitCountsMatrix A matrix of hit counts, where each row is a gene and
@@ -21,6 +19,9 @@
 #' @param refGroup The control group that each other group in the Groups factor
 #'   will be compared against. If not specified (refGroup = NULL), defaults to
 #'   the first level in the factor.
+#' @param comps A string or character vector giving the comparisons you want to
+#'   do, in the form of "B-A". Passing a named character vector will give the
+#'   output the same names.
 #' @param convertNames Boolean specifying whether names should be converted.
 #'   Note that this requires an internet connection, so keep false if you are
 #'   offline. Typically, this is used to convert the stable Ensembl ID that
@@ -29,65 +30,68 @@
 #'   from. Popular choices are "entrezgene_id" and "ensembl_gene_id".
 #' @param convertTo a string specifying a biomart object (or character vector
 #'   for several) to convert names to. Popular choices are "mgi_symbol".
+#'
+#'   @examples
+#'
+#'   data <- system.file("extdata", "sampleMatrix.Rds",
+#'                       package = "seqHelpers") |>
+#'     readr::read_rds()
+#'   grouplist <- factor(c(rep("A", times = 3),
+#'                         rep("B", times = 3),
+#'                         rep("C", times = 3),
+#'                         rep("D", times = 3)))
+#'
+#'  # Default comparison, which will compare everything to "A"
+#'  dge_OneFactor(data, Groups = grouplist)
+#'
+#'  # Compare everything to D instead
+#'  dge_OneFactor(data, Groups = grouplist, refGroup = "D")
+#'
+#'  # Compare B to A and D to C only
+#'  dge_OneFactor(data, Groups = grouplist, comps = c("B" = "B-A",
+#'                                                    "D" = "D-C"))
+#'
+#'
+#'   @return A dataframe or list of dataframes showing all genes with their
+#'     fold-change and p value for the specified comparison.
 
 #' @export
 dge_OneFactor <- function(HitCountsMatrix,
                           Groups,
                           refGroup = NULL,
+                          comps = NULL,
                           convertNames = FALSE,
                           convertFrom = NULL,
                           convertTo = NULL){
 
+  # Input QC -------------------------------------------------------------------
   if(length(Groups) != ncol(HitCountsMatrix)){
     stop("Length of Groups factor must match number of columns (samples) in
          HitCountsMatrix")
   }
 
-  y <- edgeR::DGEList(counts = HitCountsMatrix, group = Groups)
-  keep <- edgeR::filterByExpr(y)
-  y <- y[keep,,keep.lib.sizes = FALSE]
-  y <- edgeR::calcNormFactors(y)
+  # Prepare data & fit ---------------------------------------------------------
+    # (see utils.R for these functions)
+  prep <- prepNormCounts(HitCountsMatrix, Groups) |>
+    prepFit(group = Groups)
 
-  design <- stats::model.matrix(~ 0 + Groups)
-  colnames(design) <- levels(Groups)
+  # Perform comparisons --------------------------------------------------------
+  Results <- prepComps(Groups, refGroup, comps, prep) |>
+    doComps(prep)
 
-  y <- edgeR::estimateDisp(y, design, robust = TRUE)
-  fit <- edgeR::glmQLFit(y, design)
-
-  if(is.null(refGroup)){
-    refGroup <- levels(Groups[[1]])
-  }
-
-  compGroups <- levels(Groups)[levels(Groups) != refGroup]
-  names(compGroups) <- as.character(compGroups)
-
-  conlist <- purrr::map(compGroups,
-                        ~limma::makeContrasts(contrasts = paste(..1,
-                                                                "-",
-                                                                refGroup,
-                                                                sep = ""),
-                                              levels = design))
-
-  FCGeneUniverse <- purrr::map(conlist,
-                               ~edgeR::glmTreat(fit, contrast = ..1)) |>
-    purrr::map(~purrr::pluck(..1, "table")) |>
-    purrr::map(~tibble::rownames_to_column(..1, var = "GeneID")) |>
-    purrr::map(~dplyr::mutate(..1, GeneID = as.character(GeneID)))
-
+  # Convert names --------------------------------------------------------------
   if(convertNames == TRUE){
-    FCGeneUniverse <- purrr::map(FCGeneUniverse,
-                                 ~convertBiomart(..1,
-                                                 convert_from = convertFrom,
-                                                 convert_to = convertTo))
+    Results <- purrr::map(Results,
+                          ~convertBiomart(..1,
+                                          convert_from = convertFrom,
+                                          convert_to = convertTo))
   }
 
-  if(length(FCGeneUniverse) == 1){
-    FCGeneUniverse <- purrr::flatten(FCGeneUniverse)
+  # Delist structure if only one comparison ------------------------------------
+  if(length(Results) == 1){
+    Results <- purrr::flatten(Results) |>
+      tibble::as_tibble()
   }
 
-  return(FCGeneUniverse)
+  return(Results)
 }
-
-
-
-

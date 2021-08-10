@@ -8,6 +8,7 @@ dge_OneFactor(
   HitCountsMatrix,
   Groups,
   refGroup = NULL,
+  comps = NULL,
   convertNames = FALSE,
   convertFrom = NULL,
   convertTo = NULL
@@ -28,6 +29,10 @@ exactly}
 will be compared against. If not specified (refGroup = NULL), defaults to
 the first level in the factor.}
 
+\item{comps}{A string or character vector giving the comparisons you want to
+do, in the form of "B-A". Passing a named character vector will give the
+output the same names.}
+
 \item{convertNames}{Boolean specifying whether names should be converted.
 Note that this requires an internet connection, so keep false if you are
 offline. Typically, this is used to convert the stable Ensembl ID that
@@ -37,15 +42,33 @@ GeneWiz gives us into a more useful MGI symbol for downstream analysis.}
 from. Popular choices are "entrezgene_id" and "ensembl_gene_id".}
 
 \item{convertTo}{a string specifying a biomart object (or character vector
-for several) to convert names to. Popular choices are "mgi_symbol".}
+for several) to convert names to. Popular choices are "mgi_symbol".
+
+@examples
+
+data <- system.file("extdata", "sampleMatrix.Rds",
+package = "seqHelpers") |>
+readr::read_rds()
+grouplist <- factor(c(rep("A", times = 3),
+rep("B", times = 3),
+rep("C", times = 3),
+rep("D", times = 3)))Default comparison, which will compare everything to "A"
+
+dge_OneFactor(data, Groups = grouplist)Compare everything to D instead
+
+dge_OneFactor(data, Groups = grouplist, refGroup = "D")Compare B to A and D to C only
+
+dge_OneFactor(data, Groups = grouplist, comps = c("B" = "B-A",
+"D" = "D-C"))
+
+@return A dataframe or list of dataframes showing all genes with their
+fold-change and p value for the specified comparison.}
 }
 \description{
 This function handles a "default" call of edgeR to perform differential gene
 expression testing on a count matrix file. The experiment must be a
 one-factor design (this function isn't set up to handle multi-factor problems
-yet), but can have any number of levels in that design, as long as they are
-compared to a single reference group. Note that edgeR itself can handle much
-more complex designs through limma, but having the ability to catch that
-complexity in this function call is not so straightforward, and so very
-complex experiments should probably be run more manually than this.
+yet), but can have any number of levels in that design. You can either
+specify one reference group to compare all others against, or manually input
+all comparisons you want it to do. See examples for details.
 }
