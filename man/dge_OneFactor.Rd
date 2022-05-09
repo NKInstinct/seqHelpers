@@ -11,7 +11,8 @@ dge_OneFactor(
   comps = NULL,
   convertNames = FALSE,
   convertFrom = NULL,
-  convertTo = NULL
+  convertTo = NULL,
+  retainDGEList = FALSE
 )
 }
 \arguments{
@@ -42,7 +43,11 @@ GeneWiz gives us into a more useful MGI symbol for downstream analysis.}
 from. Popular choices are "entrezgene_id" and "ensembl_gene_id".}
 
 \item{convertTo}{a string specifying a biomart object (or character vector
-for several) to convert names to. Popular choices are "mgi_symbol".
+for several) to convert names to. Popular choices are "mgi_symbol".}
+
+\item{retainDGEList}{Boolean specifying whether the DGEList object built by
+edgeR should be retained and appended to the output (useful for making
+heatmaps later)
 
 @examples
 

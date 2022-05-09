@@ -30,6 +30,9 @@
 #'   from. Popular choices are "entrezgene_id" and "ensembl_gene_id".
 #' @param convertTo a string specifying a biomart object (or character vector
 #'   for several) to convert names to. Popular choices are "mgi_symbol".
+#' @param retainDGEList Boolean specifying whether the DGEList object built by
+#'   edgeR should be retained and appended to the output (useful for making
+#'   heatmaps later)
 #'
 #'   @examples
 #'
@@ -62,7 +65,8 @@ dge_OneFactor <- function(HitCountsMatrix,
                           comps = NULL,
                           convertNames = FALSE,
                           convertFrom = NULL,
-                          convertTo = NULL){
+                          convertTo = NULL,
+                          retainDGEList = FALSE){
 
   # Input QC -------------------------------------------------------------------
   if(length(Groups) != ncol(HitCountsMatrix)){
@@ -88,9 +92,14 @@ dge_OneFactor <- function(HitCountsMatrix,
   }
 
   # Delist structure if only one comparison ------------------------------------
-  if(length(Results) == 1){
+  if(length(Results) == 1 & retainDGEList == FALSE){
     Results <- purrr::flatten(Results) |>
       tibble::as_tibble()
+  }
+
+  # Keep the DGEList for heatmapping -------------------------------------------
+  if(retainDGEList == TRUE){
+    Results <- c(Results, "DGEList" = list(prep))
   }
 
   return(Results)
