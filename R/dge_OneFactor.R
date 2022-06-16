@@ -99,7 +99,7 @@ dge_OneFactor <- function(HitCountsMatrix,
 
   # Keep the DGEList for heatmapping -------------------------------------------
   if(retainDGEList == TRUE){
-    Results <- c(Results, "DGEList" = list(prep))
+    Results <- c(Results, "DGEList" = list(prepNormCounts(HitCountsMatrix, Groups)))
   }
 
   return(Results)
