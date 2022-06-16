@@ -4,7 +4,7 @@
 # utils.test.
 
 data <- system.file("extdata", "sampleMatrix.Rds", package = "seqHelpers") |>
-  readr::read_rds()
+  readRDS()
 grouplist <- factor(c(rep("A", times = 3),
                       rep("B", times = 3),
                       rep("C", times = 3),

@@ -26,8 +26,13 @@ Imports:
   limma,
   purrr,
   tibble,
-  readr,
-  statmod
+  forcats,
+  ggplot2,
+  ggpubr,
+  pathfindR,
+  stringr,
+  ggheatmap
 Suggests: 
+  statmod,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

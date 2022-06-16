@@ -47,27 +47,11 @@ for several) to convert names to. Popular choices are "mgi_symbol".}
 
 \item{retainDGEList}{Boolean specifying whether the DGEList object built by
 edgeR should be retained and appended to the output (useful for making
-heatmaps later)
-
-@examples
-
-data <- system.file("extdata", "sampleMatrix.Rds",
-package = "seqHelpers") |>
-readr::read_rds()
-grouplist <- factor(c(rep("A", times = 3),
-rep("B", times = 3),
-rep("C", times = 3),
-rep("D", times = 3)))Default comparison, which will compare everything to "A"
-
-dge_OneFactor(data, Groups = grouplist)Compare everything to D instead
-
-dge_OneFactor(data, Groups = grouplist, refGroup = "D")Compare B to A and D to C only
-
-dge_OneFactor(data, Groups = grouplist, comps = c("B" = "B-A",
-"D" = "D-C"))
-
-@return A dataframe or list of dataframes showing all genes with their
-fold-change and p value for the specified comparison.}
+heatmaps later)}
+}
+\value{
+A dataframe or list of dataframes showing all genes with their
+fold-change and p value for the specified comparison.
 }
 \description{
 This function handles a "default" call of edgeR to perform differential gene
@@ -76,4 +60,26 @@ one-factor design (this function isn't set up to handle multi-factor problems
 yet), but can have any number of levels in that design. You can either
 specify one reference group to compare all others against, or manually input
 all comparisons you want it to do. See examples for details.
+}
+\examples{
+
+  data <- system.file("extdata", "sampleMatrix.Rds",
+                      package = "seqHelpers") |>
+    readRDS()
+  grouplist <- factor(c(rep("A", times = 3),
+                        rep("B", times = 3),
+                        rep("C", times = 3),
+                        rep("D", times = 3)))
+
+ # Default comparison, which will compare everything to "A"
+ dge_OneFactor(data, Groups = grouplist)
+
+ # Compare everything to D instead
+ dge_OneFactor(data, Groups = grouplist, refGroup = "D")
+
+ # Compare B to A and D to C only
+ dge_OneFactor(data, Groups = grouplist, comps = c("B" = "B-A",
+                                                   "D" = "D-C"))
+
+
 }
