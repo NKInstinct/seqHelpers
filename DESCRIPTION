@@ -31,7 +31,8 @@ Imports:
   ggpubr,
   pathfindR,
   stringr,
-  ggheatmap
+  ggheatmap,
+  pathview
 Suggests: 
   statmod,
     testthat (>= 3.0.0)

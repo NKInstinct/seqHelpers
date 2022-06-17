@@ -2,8 +2,12 @@
 
 export(bubblePlot)
 export(dge_CleanPathfinder)
+export(dge_CollapseKeggLists)
+export(dge_GetKeggGeneLists)
 export(dge_GetMatrix)
 export(dge_OneFactor)
 export(dge_PlotHeatmap)
+export(dge_PrepKeggData)
 export(dge_RunPathfinder)
+export(plotKEGG)
 importFrom(rlang,.data)
