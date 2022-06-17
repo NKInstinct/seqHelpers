@@ -22,7 +22,7 @@ dge_CleanPathfinder <- function(pathRes, wrap = 35, foldChange = 1, geneCount = 
     dplyr::mutate(Term_Description = stringr::str_wrap(.data$Term_Description, width = wrap)) |>
     dplyr::mutate(GeneCount = paste(.data$Up_regulated, .data$Down_regulated, sep = ", "),
            GeneCount = stringr::str_remove(.data$GeneCount, "^, "),
-           GeneCount = stringr::str_count(.data$GeneCount, ", ")) |>
+           GeneCount = stringr::str_count(.data$GeneCount, pattern = stringr::boundary("word"))) |>
     dplyr::filter(.data$Fold_Enrichment > foldChange,
                   .data$GeneCount > geneCount) |>
     dplyr::select(-.data$GeneCount)
