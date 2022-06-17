@@ -14,6 +14,7 @@
 #' @return Nothing - instead, writes the output png to the working directory.
 #'   Would love to have it not do that but this seems to be a feature of
 #'   pathview.
+#' @importFrom pathview pathview
 #' @export
 #'
 plotKEGG <- function(keggData, pathway, species = "Mouse", inputDir = "KEGG Inputs/", plotName = NULL){
@@ -22,7 +23,7 @@ plotKEGG <- function(keggData, pathway, species = "Mouse", inputDir = "KEGG Inpu
   }else{
     species <- "mmu"
   }
-  pathview::pathview(gene.data = keggData,
+  pathview(gene.data = keggData,
            species = species,
            kegg.dir = inputDir,
            pathway.id = pathway,
