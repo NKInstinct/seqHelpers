@@ -40,7 +40,8 @@ dge_PrepKeggData <- function(dgeRes, geneNames = .data$Newid, pval = 0.05, enfor
   }
 
   df <- dplyr::select(df, !!geneNames, .data$logFC) |>
-    tibble::column_to_rownames(var = geneNames)
+    dplyr::filter(!is.na(!!geneNames)) |>
+    tibble::column_to_rownames(var = rlang::quo_name(geneNames))
 
   return(df)
 }
