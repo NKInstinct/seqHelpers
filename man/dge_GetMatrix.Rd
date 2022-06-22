@@ -4,7 +4,14 @@
 \alias{dge_GetMatrix}
 \title{Get CPM-corrected count matrix out of a DGEList, then filter on genes of interest}
 \usage{
-dge_GetMatrix(DGEList, genes = NULL, scale = "none", colnames = NULL)
+dge_GetMatrix(
+  DGEList,
+  genes = NULL,
+  scale = "none",
+  colnames = NULL,
+  convertMatrix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{DGEList}{A DGEList object, usually returned when you run
@@ -23,6 +30,14 @@ replaced 1:1, so it needs to be the same length as the number of columns in
 the output, and in the same order. Useful for when your sample names are
 gross and you want to replace them with something nicer for the resulting
 heatmap.}
+
+\item{convertMatrix}{Boolean, should the gene names in the matrix be
+converted? Likely want this to be true if your DGE object has converted
+names, and convert to the same readout, or else you'll get a blank matrix
+when you run this.}
+
+\item{...}{additional arguments to pass to convertBiomart (convert_from and
+convert_to, see ?convertBiomart for more details)}
 }
 \value{
 A matrix with (selected) genes as rows, samples as columns, and

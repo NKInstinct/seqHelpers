@@ -18,7 +18,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends:
   R (>= 4.1),
-  pathview (>= 1.36.0)
+  pathview (>= 1.36.0),
+  topGO (>= 2.48.0)
 Imports:
   rlang,
   biomaRt,
@@ -32,8 +33,15 @@ Imports:
   ggpubr,
   pathfindR,
   stringr,
-  ggheatmap
+  ggheatmap,
+  ComplexHeatmap,
+  cluster,
+  tidyr,
+  methods,
+  tidyselect
 Suggests: 
   statmod,
+  org.Mm.eg.db,
+  glue,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

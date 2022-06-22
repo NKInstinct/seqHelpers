@@ -16,6 +16,12 @@
 #'   the output, and in the same order. Useful for when your sample names are
 #'   gross and you want to replace them with something nicer for the resulting
 #'   heatmap.
+#' @param convertMatrix Boolean, should the gene names in the matrix be
+#'   converted? Likely want this to be true if your DGE object has converted
+#'   names, and convert to the same readout, or else you'll get a blank matrix
+#'   when you run this.
+#' @param ... additional arguments to pass to convertBiomart (convert_from and
+#'   convert_to, see ?convertBiomart for more details)
 #'
 #' @return A matrix with (selected) genes as rows, samples as columns, and
 #'   values as CPM-adjusted counts with optional scaling.
@@ -28,10 +34,24 @@
 #'
 #'   dge_GetMatrix(dgeRes$DGEList)
 #'
+#' @importFrom rlang .data
+#'
 #' @export
 #'
-dge_GetMatrix <- function(DGEList, genes = NULL, scale = "none", colnames = NULL){
+dge_GetMatrix <- function(DGEList, genes = NULL, scale = "none", colnames = NULL, convertMatrix = FALSE, ...){
   mat <- edgeR::cpm(DGEList)
+
+  if(convertMatrix == TRUE){
+    mat <- tibble::as_tibble(mat, rownames = "GeneID") |>
+      convertBiomart(...) |>
+      dplyr::select(-.data$GeneID) |>
+      dplyr::filter(!is.na(.data$Newid)) |>
+      dplyr::group_by(.data$Newid) |>
+      dplyr::summarise(dplyr::across(tidyselect::vars_select_helpers$where(is.numeric), sum)) |>
+      dplyr::ungroup() |>
+      tibble::column_to_rownames(var = "Newid") |>
+      as.matrix()
+  }
 
   if(!is.null(genes)){
     mat <- mat[rownames(mat) %in% genes,]
@@ -48,5 +68,7 @@ dge_GetMatrix <- function(DGEList, genes = NULL, scale = "none", colnames = NULL
   if(!is.null(colnames)){
     colnames(mat) <- colnames
   }
+
+
   return(mat)
 }

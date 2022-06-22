@@ -1,6 +1,6 @@
 #' @importFrom rlang .data
 #'
-convertBiomart <- function(data, convert_from = "ensemble_id", convert_to = "mgi_symbol"){
+convertBiomart <- function(data, convert_from = "ensembl_gene_id", convert_to = "mgi_symbol"){
   ensembl <- biomaRt::useEnsembl("genes", dataset = "mmusculus_gene_ensembl")
   geneList <- data$GeneID
   geneTable <- biomaRt::getBM(attributes = c(convert_from, convert_to), values = geneList, mart = ensembl) |>
