@@ -10,6 +10,7 @@ dge_PlotGOHeatmap(
   geneID,
   nClusters,
   convertMatrix = FALSE,
+  returnFullGO = FALSE,
   ...
 )
 }
@@ -32,6 +33,11 @@ a while.}
 
 \item{convertMatrix}{Boolean, should the matrix gene IDs be converted? See
 dge_GetMatrix for more.}
+
+\item{returnFullGO}{Boolean. If FALSE (default), only plots the heatmap. If
+true, returns a list containing the ggplot (which you can plot yourself),
+plus the intermediate data that shows the clusters and the genes
+contributing to the enriched GO terms.}
 
 \item{...}{Additional arguments to pass to convertBiomart (i.e. convert_from
 and convert_to). See convertBiomart for more.}

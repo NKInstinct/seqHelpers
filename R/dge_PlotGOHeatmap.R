@@ -26,8 +26,13 @@
 #'   a while.
 #' @param convertMatrix Boolean, should the matrix gene IDs be converted? See
 #'   dge_GetMatrix for more.
+#' @param returnFullGO Boolean. If FALSE (default), only plots the heatmap. If
+#'   true, returns a list containing the ggplot (which you can plot yourself),
+#'   plus the intermediate data that shows the clusters and the genes
+#'   contributing to the enriched GO terms.
 #' @param ... Additional arguments to pass to convertBiomart (i.e. convert_from
 #'   and convert_to). See convertBiomart for more.
+#'
 #'
 #' @return A ggplot heatmap of all significant genes, clustered, and annotated
 #'   with cluster-specific GO enrichments.
@@ -44,7 +49,7 @@
 #' @importFrom rlang .data
 #' @import topGO
 #' @export
-dge_PlotGOHeatmap <- function(dgeRes, genePVal, geneID, nClusters, convertMatrix = FALSE, ...){
+dge_PlotGOHeatmap <- function(dgeRes, genePVal, geneID, nClusters, convertMatrix = FALSE, returnFullGO = FALSE, ...){
   if(is.null(dgeRes$DGEList)){
     stop("dgeRes must contain a DGEList entry. Please run dge_OneFactor with retainDGEList == TRUE")
   }
@@ -59,11 +64,18 @@ dge_PlotGOHeatmap <- function(dgeRes, genePVal, geneID, nClusters, convertMatrix
   clust <- cluster::pam(sigMat, k = nClusters)
 
   GOAnnot <- clustToGO(clust, sigMat)
+  Terms <- goToTermList(GOAnnot)
 
-  gg <- plotGOHeatmap(sigMat, clust, GOAnnot)
+  gg <- plotGOHeatmap(sigMat, clust, Terms)
 
-
-  return(gg)
+  if(returnFullGO == TRUE){
+    ret <- list("Plot" = gg,
+                "GO_Table" = GOAnnot,
+                "Clustering" = clust)
+    return(ret)
+  } else{
+    return(gg)
+  }
 }
 
 # Helper functions -------------------------------------------------------------
@@ -79,7 +91,7 @@ collapseSigGenes <- function(dgeList, p, genes = .data$Newid){
   return(sigG)
 }
 
-clustToGO <- function(clustering, sigMat, species = "Mouse", geneID = "symbol", maxTerms = 5){
+clustToGO <- function(clustering, sigMat, species = "Mouse", geneID = "symbol"){
   if(species != "Mouse"){
     stop("Currently, only Mouse is supported. Please submit an issue to add other species")
   }
@@ -99,8 +111,14 @@ clustToGO <- function(clustering, sigMat, species = "Mouse", geneID = "symbol", 
     dplyr::mutate(GoTest = purrr::map(.data$GoData, runTest, algorithm = "classic", statistic = "fisher")) |>
     dplyr::mutate(GoTable = purrr::map2(.data$GoData, .data$GoTest, \(data, test) GenTable(data, PValue = test, orderBy = "PValue", ranksOf = "PValue", topNodes = 20))) |>
     dplyr::select(.data$Cluster, .data$GoTable) |>
-    dplyr::mutate(GoTable = purrr::map(.data$GoTable, \(df) dplyr::select(df, .data$GO.ID, .data$Term, .data$PValue))) |>
-    tidyr::unnest(.data$GoTable) |>
+    tidyr::unnest(.data$GoTable)
+
+  return(TableList)
+}
+
+goToTermList <- function(GOTable, maxTerms = 5){
+  terms <- GOTable |>
+    dplyr::select(.data$Cluster, .data$GO.ID, .data$Term, .data$PValue) |>
     dplyr::group_by(.data$Cluster, .data$PValue) |>
     dplyr::slice_head(n = 1) |>
     dplyr::ungroup() |>
@@ -119,7 +137,7 @@ clustToGO <- function(clustering, sigMat, species = "Mouse", geneID = "symbol", 
     tidyr::pivot_wider(names_from = .data$Cluster, values_from = .data$TermString) |>
     unlist()
 
-  return(TableList)
+  return(terms)
 }
 
 plotGOHeatmap <- function(matrix, clustering, GOAnnot){
