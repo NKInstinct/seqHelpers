@@ -39,6 +39,10 @@
 #' @export
 #'
 dge_GetMatrix <- function(DGEList, genes = NULL, scale = "none", colnames = NULL, convertMatrix = FALSE, ...){
+  if(!methods::is(DGEList, "DGEList")){
+    stop('DGEList must be an object of class "DGEList". Please see dge_OneFactor
+         for options to create one.')
+  }
   mat <- edgeR::cpm(DGEList)
 
   if(convertMatrix == TRUE){

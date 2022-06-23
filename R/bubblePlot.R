@@ -34,6 +34,11 @@
 #' @export
 #'
 bubblePlot <- function(pathRes, nRes = 10, xlim = NULL, ylim = NULL, ...){
+  if(!"Term_Description" %in% colnames(pathRes)){
+    stop("Please ensure pathRes is a single dataframe, the output of
+         dge_RunPathfinder. Vectorize as needed if your output is a list with
+         multiple dataframes.")
+  }
   pathRes |>
     dplyr::select(.data$Term_Description,
                   `Fold Enrichment` = "Fold_Enrichment",

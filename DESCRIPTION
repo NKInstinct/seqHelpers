@@ -9,8 +9,8 @@ Authors@R:
            comment = c(ORCID = "https://orcid.org/0000-0003-3116-8722"))
 Description: A couple of often-used functions for basic bulk RNA-Seq analysis. 
   Posted here for easy sharing with colleagues, but not really intended for 
-  distribution so expect breaking changes and janky paradigms if you are going 
-  to use this!.
+  distribution yet so expect breaking changes and janky paradigms if you are 
+  going to use this!.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

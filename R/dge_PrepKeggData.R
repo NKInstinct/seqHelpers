@@ -24,6 +24,12 @@
 #' @export
 #'
 dge_PrepKeggData <- function(dgeRes, geneNames = .data$Newid, pval = 0.05, enforceSentenceCase = FALSE, deduplicate = FALSE){
+  if(!methods::is(dgeRes, "data.frame")){
+    stop("dgeRes must be a single dataframe. Please vectorize if you want to use
+         all outputs from dge_OneFactor, and make sure you don't include DGEList
+         objects.")
+  }
+
   df <- dplyr::filter(dgeRes, .data$PValue < pval)
 
   geneNames <- rlang::enquo(geneNames)

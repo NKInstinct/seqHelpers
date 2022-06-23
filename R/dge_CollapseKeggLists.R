@@ -18,6 +18,11 @@
 #' @export
 #'
 dge_CollapseKeggLists <- function(keggResList){
+  if(methods::is(keggResList[[1]], "data.frame")){
+    stop("Unexpected dataframe input. Please ensure you are running this
+         function on a list of outputs from dge_GetKeggGeneLists(), not on a
+         pathfinder results table directly.")
+  }
   res <- purrr::reduce(keggResList, \(a, b){
     keys <- unique(c(names(a), names(b)))
     purrr::map2(a[keys], b[keys], c) |>
@@ -44,4 +49,4 @@ dge_CollapseKeggLists <- function(keggResList){
 #'
 #' # To combine all the genes in each list into one, we just run:
 #'
-#' combinedList <- dge_CollapseKeggList(multiCompLists)
+#' combinedList <- dge_CollapseKeggLists(multiCompLists)

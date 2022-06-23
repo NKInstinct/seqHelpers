@@ -18,6 +18,11 @@
 #'
 
 dge_CleanPathfinder <- function(pathRes, wrap = 35, foldChange = 1, geneCount = 20){
+  if(!"Term_Description" %in% colnames(pathRes)){
+    stop("Please ensure pathRes is a single dataframe, the output of
+         dge_RunPathfinder. Vectorize as needed if your output is a list with
+         multiple dataframes.")
+  }
   df <- pathRes |>
     dplyr::mutate(Term_Description = stringr::str_wrap(.data$Term_Description, width = wrap)) |>
     dplyr::mutate(GeneCount = paste(.data$Up_regulated, .data$Down_regulated, sep = ", "),
@@ -33,4 +38,4 @@ dge_CleanPathfinder <- function(pathRes, wrap = 35, foldChange = 1, geneCount = 
 #' pathRes <- system.file("extdata", "pathRes.Rds",
 #'                       package = "seqHelpers") |>
 #'     readRDS()
-#' pathClean <- dge_CleanPathfinder(pathRes)
+#' pathClean <- dge_CleanPathfinder(pathRes, geneCount = 2)

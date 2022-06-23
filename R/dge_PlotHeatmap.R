@@ -14,6 +14,9 @@
 #'
 
 dge_PlotHeatmap <- function(mat, scale = "row", cluster_rows = TRUE, show_cluster_rows = FALSE, ...){
+  if(!methods::is(mat, "matrix")){
+    stop("Please ensure mat is a matrix")
+  }
   gg <- ggheatmap::ggheatmap(mat, scale = scale, cluster_rows = cluster_rows, show_cluster_rows = show_cluster_rows, ...)
   return(gg)
 }
