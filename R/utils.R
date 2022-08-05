@@ -1,6 +1,6 @@
-prepNormCounts <- function(counts, group){
+prepNormCounts <- function(counts, group, ...){
   y <- edgeR::DGEList(counts = counts, group = group)
-  keep <- edgeR::filterByExpr(y)
+  keep <- edgeR::filterByExpr(y, ...)
   y <- y[keep,,keep.lib.sizes = FALSE]
   y <- edgeR::calcNormFactors(y)
 

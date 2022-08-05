@@ -33,6 +33,10 @@
 #' @param retainDGEList Boolean specifying whether the DGEList object built by
 #'   edgeR should be retained and appended to the output (useful for making
 #'   heatmaps later)
+#' @param ... Additional arguments to pass to edgeR::filterByExpr. Most likely
+#'   choices are "min.count", which specifies the minimum number of reads in at
+#'   least some samples, and "min.total.count", which specifies the minimum
+#'   number of reads in total, for a gene to be considered.
 #'
 #' @examples
 #'
@@ -66,7 +70,8 @@ dge_OneFactor <- function(HitCountsMatrix,
                           convertNames = FALSE,
                           convertFrom = NULL,
                           convertTo = NULL,
-                          retainDGEList = FALSE){
+                          retainDGEList = FALSE,
+                          ...){
 
   # Input QC -------------------------------------------------------------------
   if(length(Groups) != ncol(HitCountsMatrix)){
@@ -76,7 +81,7 @@ dge_OneFactor <- function(HitCountsMatrix,
 
   # Prepare data & fit ---------------------------------------------------------
     # (see utils.R for these functions)
-  prep <- prepNormCounts(HitCountsMatrix, Groups) |>
+  prep <- prepNormCounts(HitCountsMatrix, Groups, ...) |>
     prepFit(group = Groups)
 
   # Perform comparisons --------------------------------------------------------
