@@ -9,7 +9,9 @@ plotKEGG(
   pathway,
   species = "Mouse",
   inputDir = "KEGG Inputs/",
-  plotName = NULL
+  plotName = NULL,
+  geneCols = list(low = "cyan", mid = "white", high = "firebrick"),
+  cpdCols = list(low = "blue", mid = "gray", high = "yellow")
 )
 }
 \arguments{
@@ -27,6 +29,12 @@ files. Directory must exist before running this!}
 \item{plotName}{An optional string to append to the output image file. Useful
 when vectorizing so each subsequent output doesn't overwrite the previous
 one.}
+
+\item{geneCols}{A 3-length list giving the low, medium, and high colour
+values to map to gene expression. Please keep them in that order, names are
+optional.}
+
+\item{cpdCols}{As geneCols, but for compound values}
 }
 \value{
 Nothing - instead, writes the output png to the working directory.

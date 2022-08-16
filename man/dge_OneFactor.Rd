@@ -12,7 +12,8 @@ dge_OneFactor(
   convertNames = FALSE,
   convertFrom = NULL,
   convertTo = NULL,
-  retainDGEList = FALSE
+  retainDGEList = FALSE,
+  ...
 )
 }
 \arguments{
@@ -48,6 +49,11 @@ for several) to convert names to. Popular choices are "mgi_symbol".}
 \item{retainDGEList}{Boolean specifying whether the DGEList object built by
 edgeR should be retained and appended to the output (useful for making
 heatmaps later)}
+
+\item{...}{Additional arguments to pass to edgeR::filterByExpr. Most likely
+choices are "min.count", which specifies the minimum number of reads in at
+least some samples, and "min.total.count", which specifies the minimum
+number of reads in total, for a gene to be considered.}
 }
 \value{
 A dataframe or list of dataframes showing all genes with their
