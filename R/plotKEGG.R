@@ -10,6 +10,10 @@
 #' @param plotName An optional string to append to the output image file. Useful
 #'   when vectorizing so each subsequent output doesn't overwrite the previous
 #'   one.
+#' @param geneCols A 3-length list giving the low, medium, and high colour
+#'   values to map to gene expression. Please keep them in that order, names are
+#'   optional.
+#' @param cpdCols As geneCols, but for compound values
 #'
 #' @return Nothing - instead, writes the output png to the working directory.
 #'   Would love to have it not do that but this seems to be a feature of
@@ -17,7 +21,9 @@
 #' @importFrom pathview pathview
 #' @export
 #'
-plotKEGG <- function(keggData, pathway, species = "Mouse", inputDir = "KEGG Inputs/", plotName = NULL){
+plotKEGG <- function(keggData, pathway, species = "Mouse", inputDir = "KEGG Inputs/",
+                     plotName = NULL, geneCols = list("low" = "cyan", "mid" = "white", "high" = "firebrick"),
+                     cpdCols = list("low" = "blue", "mid" = "gray", "high" = "yellow")){
   if(species != "Mouse"){
     stop("plotKEGG currently only supports mouse data. Please submit an issue if you want additional species added.")
   }else{
@@ -31,9 +37,9 @@ plotKEGG <- function(keggData, pathway, species = "Mouse", inputDir = "KEGG Inpu
            same.layer = TRUE,
            multi.state = TRUE,
            out.suffix = plotName,
-           low = list(gene = "cyan", cpd = "blue"),
-           mid = list(gene = "white", cpd = "gray"),
-           high = list(gene = "firebrick", cpd = "yellow"))
+           low = list(gene = geneCols[[1]], cpd = cpdCols[[1]]),
+           mid = list(gene = geneCols[[2]], cpd = cpdCols[[2]]),
+           high = list(gene = geneCols[[3]], cpd = cpdCols[[3]]))
 }
 
 #' @examples
